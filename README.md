@@ -1,5 +1,5 @@
 # Instagram Login Test
-Instagram login UI test, only support on Windows and I choice the `Robot framework` to run the tests.
+Instagram login UI test, I choice the `Robot framework` to run the tests.
 
 
 ## Requirements
@@ -10,11 +10,11 @@ Instagram login UI test, only support on Windows and I choice the `Robot framewo
 ```bash
 source env_script.sh
 ```
-3. run the following command
+3. Run the following command to install requirements.
 ```bash
 pip install -r requirements.txt
 ```
-4. Download the `chromedriver.exe` (Chrome) and `geckodriver.exe` (Firefox) into path `project/insta_utils/browser_drivers/*`
+4. Download the Chrome driver (`chromedriver`) and Firefox driver (`geckodriver`) and put into path `project/insta_utils/browser_drivers/`
 
 
 ## Config Settings
@@ -35,4 +35,4 @@ robot testcases/instagram_login/instagram_login_features.robot
 ```
 
 ## Test Report
-The test report will generated in the project path `log.html`, `report.html` and `output.xml`
+The test report will generate in the project path `log.html`, `report.html` and `output.xml` after `Robot Framework` test completed.
