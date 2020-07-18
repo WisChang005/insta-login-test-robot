@@ -1,7 +1,7 @@
 import time
 import logging
 
-from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
 
@@ -11,14 +11,15 @@ class BasePage:
         self.wait = None
         self.driver = driver
         self.implicitly_wait_timeout = 15
-        self.driver.implicitly_wait(15)
-        self.set_explicit_wait_timeout(60)
+        self.explicit_wait_timeout = 60
+        self.driver.implicitly_wait(self.implicitly_wait_timeout)
+        self.set_explicit_wait_timeout(self.explicit_wait_timeout)
         self.driver.maximize_window()
 
-    def set_explicit_wait_timeout(self, timeout):
+    def set_explicit_wait_timeout(self, timeout: int):
         self.wait = WebDriverWait(self.driver, timeout)
 
-    def get_page(self, url):
+    def get_page(self, url: str):
         logging.info("Open URL -> %s", url)
         self.driver.get(url)
 
@@ -26,12 +27,12 @@ class BasePage:
         logging.info("Quit driver")
         self.driver.quit()
 
-    def find_element(self, *locator):
-        logging.debug("Find Element: %s", *locator)
-        _element = self.wait.until(expected_conditions.presence_of_element_located(*locator))
+    def find_element(self, locator: tuple):
+        logging.debug("Find Element: %s", locator)
+        _element = self.wait.until(ec.presence_of_element_located(locator))
         return _element
 
-    def wait_for_browser_title(self, exp_title, timeout=60):
+    def wait_for_browser_title(self, exp_title: str, timeout=60):
         for _ in range(timeout):
             logging.debug("Wait for browser title Exp: [%s], Act: [%s]", exp_title, self.driver.title)
             if self.driver.title == exp_title:
@@ -40,7 +41,7 @@ class BasePage:
         else:
             raise TimeoutError("Wait for browser title present timeout")
 
-    def wait_for_browser_title_by_partial(self, partial_tital, timeout=60):
+    def wait_for_browser_title_by_partial(self, partial_tital: str, timeout=60):
         for _ in range(timeout):
             logging.debug("Wait for browser title Exp: [%s], Act: [%s]", partial_tital, self.driver.title)
             if partial_tital in self.driver.title:
@@ -49,7 +50,7 @@ class BasePage:
         else:
             raise TimeoutError("Wait for browser title present timeout")
 
-    def is_element_present(self, *locator):
+    def is_element_present(self, locator: tuple):
         self.driver.implicitly_wait(0)
         try:
             self.driver.find_element(*locator)
@@ -58,6 +59,10 @@ class BasePage:
             return False
         finally:
             self.driver.implicitly_wait(self.implicitly_wait_timeout)
+
+    def switch_to_frame(self, locator: tuple):
+        logging.info("Switch to frame -> [%s]", locator)
+        self.wait.until(ec.frame_to_be_available_and_switch_to_it(locator))
 
     def is_page_load_complete(self):
         js_state = ''

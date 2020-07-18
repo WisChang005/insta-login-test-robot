@@ -1,10 +1,13 @@
 # import time
 # import logging
 
-from insta_utils import file_util
+from insta_utils.config_helper import ConfigHelper
 from insta_utils.robot_data import RobotDataStore
 from insta_utils.browser_drivers import browser_helper
-from insta_utils.insta_pages.instagram_login_page import InstagramLoginPage
+from insta_utils.ig_pages.login_page_actions import InstagramLoginPage
+
+
+config = ConfigHelper()
 
 
 def setup_instagram_login_page(browser_type):
@@ -26,15 +29,13 @@ def get_instagram_login_page():
 
 def close_instagram_login_page():
     login_page = RobotDataStore.get_env_var("login_page_obj")
-    login_page.close_this_browser()
+    login_page.quit_driver()
 
 
 def type_correct_login_info():
     login_page = RobotDataStore.get_env_var("login_page_obj")
-    username = file_util.read_config()["instagram_user"]
-    password = file_util.read_config()["instagram_pwd"]
-    login_page.input_username(username)
-    login_page.input_password(password)
+    login_page.input_username(config.get_ig_username())
+    login_page.input_password(config.get_ig_password())
 
 
 def click_login_button():
@@ -50,6 +51,7 @@ def click_login_with_fb():
 def check_login_succeed():
     login_page = RobotDataStore.get_env_var("login_page_obj")
     login_page.wait_for_browser_title("Instagram")
+    login_page.verify_search_bar_exist()
 
 
 def check_page_title(page_title):
@@ -61,10 +63,10 @@ def type_incorrect_login_info(incorrect_field: str):
     login_page = RobotDataStore.get_env_var("login_page_obj")
     if incorrect_field == "username":
         username = "wrong_username@gmail.com"
-        password = file_util.read_config()["instagram_pwd"]
+        password = config.get_ig_password()
 
     if incorrect_field == "password":
-        username = file_util.read_config()["instagram_user"]
+        username = config.get_ig_username()
         password = "wrong Passw0rd@"
 
     login_page.input_username(username)
@@ -74,8 +76,7 @@ def type_incorrect_login_info(incorrect_field: str):
 def check_login_error_alert_msg(incorrect_field: str):
     login_page = RobotDataStore.get_env_var("login_page_obj")
     if incorrect_field == "username":
-        exp_msg = "The username you entered doesn't belong to an account. Please check your username and try again."
+        login_page.verify_username_alert()
 
     if incorrect_field == "password":
-        exp_msg = "Sorry, your password was incorrect. Please double-check your password."
-    login_page.check_login_error_alert_msg(exp_msg)
+        login_page.verify_password_alert()
