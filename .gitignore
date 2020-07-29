@@ -127,7 +127,8 @@ dmypy.json
 # env
 config.yaml
 env_script.sh
-*.exe
+chromedriver*
+geckodriver*
 log.html
 output.xml
 report.html
